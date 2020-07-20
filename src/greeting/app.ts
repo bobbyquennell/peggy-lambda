@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayEventRequestContext } from 'aws-lambda';
-// const axios = require('axios')
+import axios from 'axios';
 // const url = 'http://checkip.amazonaws.com/';
 let response;
 
@@ -17,16 +17,17 @@ let response;
  */
 exports.lambdaHandler = async (event: APIGatewayProxyEvent, context: APIGatewayEventRequestContext): Promise<APIGatewayProxyResult> => {
     try {
-        // const ret = await axios(url);
-
+        let result = await axios({
+            method: 'get',
+            url: 'https://jsonplaceholder.typicode.com/todos/1',
+          });
         const inboundMsg = JSON.parse(event?.body);
         console.log(`received message ===> ${inboundMsg?.name} said: ${inboundMsg?.message}`);
-
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
                 message: `Hi ${inboundMsg?.name?? 'there'}, I am Peggy`,
-                // location: ret.data.trim()
+                additionalData: result.data
             })
         }
     } catch (err) {
@@ -34,5 +35,5 @@ exports.lambdaHandler = async (event: APIGatewayProxyEvent, context: APIGatewayE
         return err;
     }
 
-    return response
+    return response;
 };
